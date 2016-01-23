@@ -1,0 +1,87 @@
+//
+//  AddEvent.h
+//  pushCalendar
+//
+//  Created by iosdev on 11/6/11.
+//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "CalendarView.h"
+<<<<<<< HEAD
+=======
+
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+
+@class DatePickView;
+@class RepeatEvent;
+@class ListingView;
+
+<<<<<<< HEAD
+@interface AddEvent : UIViewController<NSXMLParserDelegate, UITextFieldDelegate>
+=======
+@interface AddEvent : UIViewController<NSXMLParserDelegate,UITextFieldDelegate>
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+{
+    IBOutlet UIScrollView *AddEventScrollview;
+    IBOutlet DatePickView *datepickview;
+    IBOutlet RepeatEvent *repeatevent;
+    IBOutlet ListingView *LVC;
+    
+    IBOutlet UITextField *titleText;
+    IBOutlet UITextField *descripText;
+    IBOutlet UITextField *dateText;
+    IBOutlet UITextField *timeText;
+    IBOutlet UITextField *startTimeText;
+    IBOutlet UITextField *endTimeText;
+    IBOutlet UILabel *Response;
+        
+    
+    NSString *serverResponse;
+    NSString *title;
+    NSString *description;
+    NSString *eventDate;
+    NSString *eventStartTime;
+    NSString *eventEndTime;
+    NSString *dateString;
+    NSNumber *myEventId;
+    NSInteger intId;
+    
+    NSMutableString *foundString;
+    NSMutableData *receivedData;
+    
+    CalendarView *cVc;
+    
+    UITextField *dateField;
+    NSString *dateString;
+    CalendarView *cVc;
+    
+    
+}
+
+@property(nonatomic,retain)NSString *dateString;
+@property(nonatomic,retain) IBOutlet UITextField *dateField;
+@property(nonatomic,strong)CalendarView *cVc;
+
+
+-(IBAction) back;
+-(IBAction)pickdate;
+-(IBAction)sendData:(id)sender;
+-(IBAction)removeKeyboard:(id)sender;
+- (void)parseData:(NSData *)data;
+-(IBAction)repeatevent;
+
+@property (nonatomic ,strong) UITextField *titleText; 
+@property (nonatomic ,strong) UITextField *descripText; 
+@property (nonatomic ,strong) UITextField *dateText;
+@property (nonatomic ,strong) UITextField *startTimeText;
+@property (nonatomic ,strong) UITextField *endTimeText;
+@property (nonatomic,strong)NSMutableString *foundString;
+@property (nonatomic ,strong) NSMutableData *receivedData;
+@property(nonatomic,strong)NSString *dateString;
+@property(nonatomic,strong)NSNumber *myEventId;
+@property(nonatomic,strong)CalendarView *cVc;
+@property(nonatomic, strong) ListingView *LVC;
+
+
+@end

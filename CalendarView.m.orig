@@ -1,0 +1,942 @@
+//
+//  CalendarView.m
+//  pushCalendar
+//
+//  Created by iosdev on 11/14/11.
+//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//
+
+#import "CalendarView.h"
+#import <QuartzCore/QuartzCore.h>
+#import "AddEvent.h"
+
+const unsigned int uppermargin =80;
+unsigned int x;
+unsigned int y;
+const float width=40;
+const  float height=35;
+const  float prevNextButtonSize=20;
+const  float prevNextButtonSpaceWidth=15;
+const float prevNextButtonSpaceHeight=10;
+
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+@implementation CalendarView
+
+@synthesize currentMonthDate;
+@synthesize currentSelectDate;
+@synthesize currentTime;
+@synthesize viewImageView;
+@synthesize currentWeek;
+@synthesize delegate1;
+
+
+
+-(void)initCalView{
+	currentTime=CFAbsoluteTimeGetCurrent();
+	currentMonthDate=CFAbsoluteTimeGetGregorianDate(currentTime,CFTimeZoneCopyDefault());
+	currentMonthDate.day=1;
+	currentSelectDate.year=0;
+    currentWeek = CFAbsoluteTimeGetGregorianDate(currentTime, CFTimeZoneCopyDefault());
+    [self getWeekOfYear:currentWeek];
+    self.backgroundColor=[UIColor whiteColor];
+    
+    UILongPressGestureRecognizer *doubleTap=[[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(doubleTap:)];
+    doubleTap.numberOfTouchesRequired =1;
+    doubleTap.minimumPressDuration = 1.01;
+    [self addGestureRecognizer:doubleTap];
+}
+
+- (id)initWithCoder:(NSCoder *)coder {
+    if (self = [super initWithCoder:coder]) {
+		[self initCalView];
+    }
+    return self;
+}
+
+- (id)initWithFrame:(CGRect)frame {
+	
+	if (self = [super initWithFrame:frame]) {
+		[self initCalView];
+	}
+	return self;
+}
+-(CalendarView *)init{
+    self =[super init];
+    if(self){}
+    return self;
+}
+-(int)getDayCountOfaMonth:(CFGregorianDate)date{
+	switch (date.month) {
+		case 1:
+		case 3:
+		case 5:
+		case 7:
+		case 8:
+		case 10:
+		case 12:
+			return 31;
+			
+		case 2:
+			if(date.year%4==0 && date.year%100!=0)
+				return 29;
+			else
+				return 28;
+		case 4:
+		case 6:
+		case 9:		
+		case 11:
+			return 30;
+		default:
+			return 31;
+	}
+}
+
+-(void)drawPrevButton:(CGPoint)leftTop{
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    CGContextSetGrayStrokeColor(ctx, 0, 1);
+    CGContextMoveToPoint(ctx,leftTop.x , prevNextButtonSpaceWidth/2+leftTop.y);
+    CGContextAddLineToPoint(ctx, prevNextButtonSize+leftTop.x, leftTop.y);
+    CGContextAddLineToPoint(ctx, prevNextButtonSize+leftTop.x, prevNextButtonSize+leftTop.y);
+    
+    CGContextFillPath(ctx);
+}
+
+-(void)drawNextButton:(CGPoint )leftTop{
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    CGContextSetGrayStrokeColor(ctx, 0, 1);
+    CGContextMoveToPoint(ctx,leftTop.x,  leftTop.y);
+    CGContextAddLineToPoint(ctx, prevNextButtonSize+leftTop.x, prevNextButtonSpaceHeight+leftTop.y);
+    CGContextAddLineToPoint(ctx, 0+leftTop.x, prevNextButtonSize+leftTop.y);    
+    CGContextFillPath(ctx);
+    
+}
+
+-(void)drawTopGradientBar{
+    
+    
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    size_t num_locations=3;
+    CGFloat locations[3]={0.0,0.7,1.0}; // total number of position
+    CGFloat components[12]={0.0,0.30,0.0,1.0,
+        0.5,0.5,0.5,0.5,
+        0.40,0.0,0.10,1.0
+    }; // color combination
+    CGGradientRef myGradient;
+    CGColorSpaceRef myColorspace = CGColorSpaceCreateDeviceRGB();
+    myGradient =CGGradientCreateWithColorComponents(myColorspace, components, locations, num_locations);
+    CGPoint myStartPoint, myEndPoint;
+    myStartPoint.x=uppermargin;
+    myStartPoint.y=0.0;
+    myEndPoint.x=uppermargin;
+    myEndPoint.y=uppermargin;
+    
+    CGContextDrawLinearGradient(ctx, myGradient, myStartPoint, myEndPoint, 0);
+    
+    CGGradientRelease(myGradient);
+    CGColorSpaceRelease(myColorspace);
+
+    
+    // Draw Previous Button and next button
+    [self drawPrevButton:CGPointMake(10, 15)];
+    [self drawNextButton:CGPointMake(290, 15)];
+    
+    
+    
+}
+
+
+#pragma mark -
+#pragma mark function to draw Date Boxes
+- (void)drawDateBoxes
+{
+    CGRect rectangle;
+    // Drawing code
+    for(int i =0;i<6;i++){
+        y=i*height+uppermargin;
+        
+        for(int j =0;j<8;j++){
+            x=j*width;
+            
+<<<<<<< HEAD
+            CGMutablePathRef path = CGPathCreateMutable();              /*create the path first*/
+            rectangle = CGRectMake(x, y, width, height);  /*our rectangle boundaries*/
+            CGPathAddRect(path, NULL, rectangle);                       /*add the rectangle to the path*/
+            CGContextRef currentContext =UIGraphicsGetCurrentContext(); /*get the handle to the current context*/
+            CGContextAddPath(currentContext, path);                       /*add the path to the context*/
+            [[UIColor colorWithRed:0.20f green:0.60f blue:0.0f alpha:0.25f]setFill];/*set the fill color*/
+            [[UIColor colorWithRed:0.0f green:0.0f blue:0.10f alpha:0.1f]setStroke];                            //set the stroke color to brown
+            CGContextSetLineWidth(currentContext, 1.0f);                                    /*set the line width*/
+            CGContextDrawPath(currentContext, kCGPathFillStroke);       /*stroke and fill the path on the context*/
+=======
+            CGMutablePathRef path = CGPathCreateMutable();//creates the path first
+            rectangle = CGRectMake(x, y, width, height);//our rectangle boundaries
+            CGPathAddRect(path, NULL, rectangle);//add the rectangle to the path
+            CGContextRef currentContext =UIGraphicsGetCurrentContext(); //get the handle to the current context
+            CGContextAddPath(currentContext, path);//add the path to the context
+            [[UIColor colorWithRed:1.0f green:1.0f blue:1.0f alpha:1.0f]setFill];//set the fill color
+            [[UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.1f]setStroke];//set the stroke color to brown
+            CGContextSetLineWidth(currentContext, 1.0f);//set the line width
+            CGContextDrawPath(currentContext, kCGPathFillStroke);//stroke and fill the path on the context
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+            CGPathRelease(path);     
+        }/*dispose of the path*/
+    }
+    //Drawing the UIView
+    
+}
+
+
+
+#pragma mark -
+#pragma mark function to draw small rectangle on the date cells to mark events.
+
+-(void)drawEventMarkwithX:(int)x andY:(int) y andColor:(UIColor *)fillColor
+{
+    CGRect eventMark;
+    x = x+(14/2); //move x to the horizontal midpoint of the date letter
+    y = y+18; // move y to the bottom of the letter
+    eventMark = CGRectMake(x, y, 4, 4);
+    CGMutablePathRef path = CGPathCreateMutable();              /*create the path first*/
+    CGPathAddRect(path, NULL, eventMark);                       /*add the rectangle to the path*/
+    CGContextRef currentContext =UIGraphicsGetCurrentContext(); /*get the handle to the current context*/
+    CGContextAddPath(currentContext, path);                       /*add the path to the context*/
+    [fillColor setFill];/*set the fill color*/
+    CGContextSetLineWidth(currentContext, 1.0f);                                    /*set the line width*/
+    CGContextDrawPath(currentContext, kCGPathFill);       /*stroke and fill the path on the context*/
+    CGPathRelease(path);   
+    
+}
+
+
+-(void)drawNameOfDaysAtTop {
+    
+    [[UIColor blackColor]set];
+    int width = self.frame.size.width;// gives the total size of the frame ie 320
+    int s_width = width/8;// we want to have the display in the same amount of distance 8 column
+    int fontsize= [UIFont buttonFontSize]; //buttonFontSize returns the fonts suitable for a button
+    NSString *monthName;
+    int counter;
+    switch (currentMonthDate.month) {
+        case 1:
+            monthName=@"January";
+            counter = [monthName length];
+            break;
+        case 2:
+            monthName=@"February";
+            counter = [monthName length];
+            break;
+        case 3:
+            monthName=@"March";
+            counter = [monthName length];
+            break;
+        case 4:
+            monthName=@"April";
+            counter = [monthName length];
+            break;
+        case 5:
+            monthName=@"May";
+            counter = [monthName length];
+            break;
+        case 6:
+            monthName=@"June";
+            counter = [monthName length];
+            break;
+        case 7:
+            monthName=@"July";
+            counter = [monthName length];
+            break;
+        case 8:
+            monthName=@"August";
+            counter = [monthName length];
+            break;
+        case 9:
+            monthName=@"September";
+            counter = [monthName length];
+            break;
+        case 10:
+            monthName=@"October";
+            counter = [monthName length];
+            break;
+        case 11:
+            monthName=@"November";
+            counter = [monthName length];
+            break;
+        case 12:
+            monthName=@"December";
+            counter = [monthName length];
+            break;
+            
+        default:
+            break;
+    }
+<<<<<<< HEAD
+    NSLog(@"counter = %d",counter);
+    NSString *title_Month = [[NSString alloc]initWithFormat:@"%@ %d",monthName,currentMonthDate.year];
+    
+    
+    int fontsize= [UIFont buttonFontSize]; //buttonFontSize returns the fonts suitable for a button
+    
+    UIFont *font = [UIFont boldSystemFontOfSize:20];
+    CGPoint location = CGPointMake( (width/2 -((counter+5)*11.5)/2), prevNextButtonSpaceHeight); //location holds the points set by cgpointmake
+    
+=======
+    counter = [monthName length];
+
+    
+    NSString *title_Month = [[NSString alloc]initWithFormat:@"%@ %d",monthName,currentMonthDate.year];
+    UIFont *font = [UIFont boldSystemFontOfSize:20];
+    CGPoint location = CGPointMake( (width/2 -((counter+5)*11.5)/2), prevNextButtonSpaceHeight); //location holds the points set by cgpointmake
+   
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+    [title_Month drawAtPoint:location withFont:font];
+    UIFont *weekfont = [UIFont boldSystemFontOfSize:15];
+    
+    fontsize+=23;
+    [[UIColor brownColor]set];
+    [@"Wk" drawAtPoint:CGPointMake(s_width*0+9,fontsize) withFont:weekfont];
+    [[UIColor blackColor]set];
+    [@"Mon" drawAtPoint:CGPointMake(s_width*0.89+9,fontsize) withFont:weekfont];
+    [@"Tue" drawAtPoint:CGPointMake(s_width*1.89+9,fontsize) withFont:weekfont];
+	[@"Wed" drawAtPoint:CGPointMake(s_width*2.89+9,fontsize) withFont:weekfont];
+	[@"Thu" drawAtPoint:CGPointMake(s_width*3.89+9,fontsize) withFont:weekfont];
+	[@"Fri" drawAtPoint:CGPointMake(s_width*4.89+9,fontsize) withFont:weekfont];
+	[[UIColor colorWithRed:0.0 green:0.2 blue:1 alpha:0.9]set];
+	[@"Sat" drawAtPoint:CGPointMake(s_width*5.89+9,fontsize) withFont:weekfont];
+    [[UIColor redColor] set];
+	[@"Sun" drawAtPoint:CGPointMake(s_width*6.8+9,fontsize) withFont:weekfont];
+    [[UIColor blackColor]set];
+    
+    
+}
+
+
+
+#pragma mark -
+#pragma mark function to get the day of first of the month
+- (int)getMonthWeekday:(CFGregorianDate)date{
+    
+    CFTimeZoneRef timezone= CFTimeZoneCopyDefault();
+    CFGregorianDate month_date;
+    month_date.year = date.year;
+    month_date.month=date.month;
+    month_date.day=1;
+    month_date.hour=0;
+    month_date.minute=0;
+    month_date.second=1;
+    return (int)CFAbsoluteTimeGetDayOfWeek(CFGregorianDateGetAbsoluteTime(month_date, timezone), timezone);
+    
+    
+}
+
+
+#pragma mark -
+#pragma mark function to get the week number for the given date
+-(int)getWeekOfYear:(CFGregorianDate)date{
+    
+    CFTimeZoneRef timezone= CFTimeZoneCopyDefault();
+    CFGregorianDate month_date;
+    month_date.year = date.year;
+    month_date.month=date.month;
+    month_date.day=1;
+    month_date.hour=0;
+    month_date.minute=0;
+    month_date.second=1;
+    
+<<<<<<< HEAD
+    //   NSLog(@"check week return =%ld",CFAbsoluteTimeGetWeekOfYear(CFGregorianDateGetAbsoluteTime(month_date, timezone), timezone));
+    
+=======
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+    return (int)CFAbsoluteTimeGetWeekOfYear(CFGregorianDateGetAbsoluteTime(month_date, timezone), timezone);
+    
+}
+
+#pragma mark -
+#pragma mark function to draw date letters
+-(void)drawDateWords{
+    
+    
+    CGContextRef ctx =UIGraphicsGetCurrentContext();
+    int width = self.frame.size.width;
+    
+    int dayCount = [self getDayCountOfaMonth:currentMonthDate];
+    int day =0;
+    int x =0;
+    int y =0,i;
+    int s_width=width/8;
+    int eventmarkpointx;//variables to send point location to function which marks the date cell with event
+    int eventmarkpointy;// Do not delete these two variables, useful for the codes commented below    
+    int current_weekday = [self getMonthWeekday:currentMonthDate];  
+    int getweekofthemonth = [self getWeekOfYear:currentMonthDate];
+    NSLog(@"current week = %d",getweekofthemonth);
+    
+    UIFont *weekfont =[UIFont boldSystemFontOfSize:15];
+    
+<<<<<<< HEAD
+    //int check_sunday=0;
+    int check_saturday=0;
+    int check_week=90;
+    
+    [[UIColor brownColor]set];
+    //Week Number Display
+=======
+    int check_sunday=0;
+    int check_week=80;
+    int sundaycolored=0;
+    
+    
+    /*if current month is January but first day is still part of week 52, the system gives week 53 for that day, in that case change it to 52*/
+    //added by Udeep to check if the year starts with week 53 or 52
+    int collectWeekNumbers = [self getWeekOfYear:currentMonthDate];
+    int week53isTrue = 0; // a flag to check whether year starts with week 53
+    
+    if(collectWeekNumbers >52){
+        CFGregorianDate prevmonthslastday;
+        prevmonthslastday.year = currentMonthDate.year-1;
+        prevmonthslastday.month=12;
+        prevmonthslastday.day=31;
+        int prevmonthslastdayweek = [self getWeekOfYear:prevmonthslastday];
+        
+        if(prevmonthslastdayweek!=53){
+            collectWeekNumbers =52;           
+        }
+        else{
+            week53isTrue =1;
+        }
+        
+    } 
+    // codes to check if the year starts with week 53 or 52  ends here
+    
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+    
+    // Draw week numbers
+    [[UIColor orangeColor]set];
+    for(int k =1;k<7;k++){
+        
+        if(getweekofthemonth==53){
+            getweekofthemonth =52;
+        }
+        NSString *week = [[NSString alloc]initWithFormat:@"%2d",getweekofthemonth];   
+        [week drawAtPoint:CGPointMake(s_width-30, check_week) withFont:weekfont];
+        getweekofthemonth++;
+        
+        if(getweekofthemonth==53){
+            getweekofthemonth =1;
+        }
+        
+        check_week+=35;
+        
+    }
+    // Draw week numbers ends here
+    
+    
+    //Draw dates starts here
+    [[UIColor blackColor]set];       
+    for( i=1;i<dayCount+1;i++){
+        day = i + current_weekday-2;  
+        x = day%7;
+        y=day/7;
+        
+        
+        //printing 
+        NSString *date = [[NSString alloc]initWithFormat:@"%2d",i];
+        
+<<<<<<< HEAD
+        // Saturday and Sunday for colouring
+        check_saturday=x*s_width+50;
+        //Added by Udeep
+=======
+        // Assigning the x coordinate to variable so that it is easy to check if it falls on sunday.
+        check_sunday=x*s_width+50;
+        
+        
+        //Added by Udeep, code to print date of the previous month
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+        if(i==1){
+            CFGregorianDate prevMonthDate = CFAbsoluteTimeGetGregorianDate(currentTime, CFTimeZoneCopySystem());
+            
+            prevMonthDate.year=currentMonthDate.year;
+<<<<<<< HEAD
+            prevMonthDate.month= currentMonthDate.month-1;
+            
+=======
+            prevMonthDate.month= currentMonthDate.month-1;            
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+            int prevmonthdayCount = [self getDayCountOfaMonth:prevMonthDate];
+            int pos;
+            int beginning=check_sunday-s_width;
+            for(pos=beginning;pos>=50;pos-=s_width){
+                NSString *prevdate = [[NSString alloc]initWithFormat:@"%2d",prevmonthdayCount];
+                [[UIColor grayColor]set];
+                [prevdate drawAtPoint:CGPointMake(pos, uppermargin+10) withFont:weekfont];
+                
+                prevmonthdayCount--;
+                
+                
+                //Dont delete the commented codes below, it's for marking event on the dates. - Udeep
+                /*
+                //if there is event on this date, draw eventmark on this date
+                UIColor *fadedEventColor= [UIColor colorWithRed:0.5f green:0.5f blue:0.5f alpha:1.0f];//set the fill color
+                [self drawEventMarkwithX:pos andY:uppermargin+10 andColor:fadedEventColor];
+                 */
+            }
+<<<<<<< HEAD
+            [[UIColor blackColor]set];    
+            
+        }
+        
+        
+        //colour saturday
+        if(check_saturday ==250){
+            [[UIColor blueColor]set];
+            [date drawAtPoint:CGPointMake(x*s_width+50, y*35+uppermargin+10) withFont:weekfont];
+            
+=======
+            
+            [[UIColor blackColor]set]; // set the color back to normal      
+            
+        }
+        
+        //code to print date of the previous month is ends here
+        
+        
+       //if it's sunday, change the color
+        if(check_sunday == 290){
+            [[UIColor redColor]set];
+            sundaycolored = 1;
+        }
+        
+        [date drawAtPoint:CGPointMake(x*s_width+50, y*35+uppermargin+10) withFont:weekfont];
+        
+        
+        //Dont delete the commented codes below, it's for marking event on the dates. - Udeep
+        /*
+        //if there is event on this date
+        eventmarkpointx=x*s_width+50; //give x and y coordiate of the point from where date letter is drawn
+        eventmarkpointy=y*35+uppermargin+10;
+        UIColor *eventColor= [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:1.0f];//set the fill color
+        [self drawEventMarkwithX:eventmarkpointx andY:eventmarkpointy andColor:eventColor];
+        */
+        
+        //sunday has been just printed, change the color back to normal
+        if(sundaycolored ==1){
+            [[UIColor blackColor]set];
+            sundaycolored =0;
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+        }
+        CGContextSetRGBFillColor(ctx, 0, 0, 0, 1);
+        
+        
+        
+    }
+<<<<<<< HEAD
+=======
+    //drawing dates from previous months and cuurent month ends here
+    
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+    // printing next month's dates, code added by udeep
+    int nextdate=1;
+    int endx=(x+1)*s_width+50;
+    for(int endy=y*35+uppermargin+10;endy<=5*35+uppermargin+10;endy+=35){
+        for(;endx<=6*s_width+50;endx+=s_width){
+            NSString *nextdatestring = [[NSString alloc]initWithFormat:@"%2d",nextdate];
+            [[UIColor grayColor]set];
+            [nextdatestring drawAtPoint:CGPointMake(endx, endy) withFont:weekfont];
+            nextdate++;
+                                
+            //Dont delete the commented codes below, it's for marking event on the dates. - Udeep
+            /*
+            //if there is event on this dates, put if condition in the code below
+            UIColor *fadedEventColor= [UIColor colorWithRed:0.5f green:0.5f blue:0.5f alpha:1.0f];//set the fill color
+            [self drawEventMarkwithX:endx andY:endy andColor:fadedEventColor];
+             */
+            
+            
+        }
+        endx=0*s_width+50;
+        
+    }
+    //printing next month's dates ends here
+    
+    
+    
+    
+    
+    
+}
+
+
+-(void)movePrevNext:(int)isPrev{
+    
+    currentSelectDate.year =0;
+    
+    
+    int width=self.frame.size.width;
+    int position;
+    if(isPrev==1){
+        position=width;
+    }
+    else
+        position=-width;
+    
+    UIImage *viewImage;
+    
+    UIGraphicsBeginImageContext(self.bounds.size);
+    [self.layer renderInContext:UIGraphicsGetCurrentContext()];
+    viewImage = UIGraphicsGetImageFromCurrentImageContext();
+    if(viewImageView ==nil){
+        viewImageView = [[UIImageView alloc]initWithImage:viewImage];
+        viewImageView.center=self.center;
+        [[self superview]addSubview:viewImageView];
+    }
+    else
+    {
+        viewImageView.image=viewImage;
+        
+    }
+    
+    viewImageView.hidden =NO;
+    viewImageView.transform = CGAffineTransformMakeTranslation(0, 0);
+    self.hidden=YES;
+    [self setNeedsDisplay];
+    self.transform=CGAffineTransformMakeTranslation(position, 0);
+
+	self.hidden=NO;
+	[UIView beginAnimations:nil	context:nil];
+	[UIView setAnimationDuration:0.5];
+	self.transform=CGAffineTransformMakeTranslation(0,0);
+	viewImageView.transform=CGAffineTransformMakeTranslation(-position, 0);
+	[UIView commitAnimations];
+    
+}
+
+- (void)movePrevMonth{
+	if(currentMonthDate.month>1){
+		currentMonthDate.month-=1;
+<<<<<<< HEAD
+        
+        [self getWeekOfYear:currentMonthDate];
+        
+        // NSLog(@"check the WeekHere1 %d",collectWeekNumbers);
+=======
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+    }
+	else
+	{
+		currentMonthDate.month=12;
+		currentMonthDate.year-=1;
+        
+	}
+<<<<<<< HEAD
+	[self movePrevNext:0]; 
+    [self getWeekOfYear:currentMonthDate ];
+    
+=======
+	[self movePrevNext:0];     
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+    
+}
+
+
+
+- (void)moveNextMonth{
+	if(currentMonthDate.month<12){
+<<<<<<< HEAD
+		currentMonthDate.month+=1;
+        [self getWeekOfYear:currentMonthDate];
+        
+=======
+		currentMonthDate.month+=1;        
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+    }
+	else
+	{
+		currentMonthDate.month=1;
+		currentMonthDate.year+=1;
+<<<<<<< HEAD
+        [self getWeekOfYear:currentMonthDate];
+=======
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+	}
+	[self movePrevNext:1];
+	
+    
+}
+
+
+//change the color of the selected cell
+-(void)changeColor{
+<<<<<<< HEAD
+=======
+    int x;
+    int y;
+    int day;
+    if(currentSelectDate.year !=0){
+        int width = self.frame.size.width;
+        int s_width=width/8;
+        int weekday = [self getMonthWeekday:currentMonthDate];
+        day=currentSelectDate.day+weekday-2;
+        x=day%7;
+        y=day/7;
+        
+        //to shade the cell for today's date
+        CGContextRef ctx = UIGraphicsGetCurrentContext();
+        CGContextSetRGBFillColor(ctx, 0.0, 0.5, 1.0, 0.2);
+        CGContextMoveToPoint(ctx, x*s_width+s_width, y*height+uppermargin);
+        CGContextAddLineToPoint(ctx, x*s_width+s_width+s_width, y*height+uppermargin);
+        CGContextAddLineToPoint(ctx, x*s_width+s_width+s_width, y*height+uppermargin+height);
+        CGContextAddLineToPoint(ctx, x*s_width+s_width, y*height+uppermargin+height);
+        CGContextFillPath(ctx); 
+        
+    }
+    
+}
+
+
+
+
+/*
+-(void) touchAtDate:(CGPoint)touchPoint{
+    
+    NSString *tempstring ;
+    //[self changeColor];
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+    int x;
+    int y;
+    int day;
+    if(currentSelectDate.year !=0){
+        int width = self.frame.size.width;
+        int s_width=width/8;
+        int weekday = [self getMonthWeekday:currentMonthDate];
+        day=currentSelectDate.day+weekday-2;
+        x=day%7;
+        y=day/7;
+        
+        //to shade the cell for today's date
+        CGContextRef ctx = UIGraphicsGetCurrentContext();
+        CGContextSetRGBFillColor(ctx, 0.0, 0.5, 1.0, 0.2);
+        CGContextMoveToPoint(ctx, x*s_width+s_width, y*height+uppermargin);
+        CGContextAddLineToPoint(ctx, x*s_width+s_width+s_width, y*height+uppermargin);
+        CGContextAddLineToPoint(ctx, x*s_width+s_width+s_width, y*height+uppermargin+height);
+        CGContextAddLineToPoint(ctx, x*s_width+s_width, y*height+uppermargin+height);
+        CGContextFillPath(ctx); 
+        
+    }
+ 
+    
+}
+*/
+ 
+
+
+-(void)createAddevent{
+    AddEvent *addEvent = [[AddEvent alloc]initWithNibName:@"AddEvent" bundle:nil];
+    
+    addEvent.cVc=self;
+    
+    NSString *miti = [NSString stringWithFormat:@"%d-%d-%d",currentSelectDate.year,currentSelectDate.month,currentSelectDate.day];
+    
+    
+    [self addSubview:addEvent.view];
+    addEvent.dateField.text = miti;
+    
+    
+}
+
+
+- (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    int width=self.frame.size.width;
+    int x,y;
+    
+    int weekday=[self getMonthWeekday:currentMonthDate];// get the current month
+    int monthDayCount=[self getDayCountOfaMonth:currentMonthDate];//get the total day of the month
+    
+	UITouch* touch=[touches anyObject];
+	CGPoint touchPoint=[touch locationInView:self];
+    int taps=[touch tapCount];
+    NSLog(@"tap=%d",taps);
+    x=((touchPoint.x-40)*7)/width;
+    y=(touchPoint.y-(uppermargin))/height;
+    int monthday=x+y*7-weekday+2;
+    
+	if(touchPoint.x<40 && touchPoint.y<40)
+		[self movePrevMonth];
+	else if(touchPoint.x>width-40 && touchPoint.y<40)
+		[self moveNextMonth];
+    else if((touchPoint.x>=40 && touchPoint.x<=width) && (touchPoint.y>=80 && touchPoint.y<=300 )){
+        
+        if(monthday>0 && monthday<monthDayCount+1){
+            currentSelectDate.year=currentMonthDate.year;
+            currentSelectDate.month=currentMonthDate.month;
+            currentSelectDate.day=monthday;
+            currentSelectDate.hour=0;
+            currentSelectDate.minute=0;
+            currentSelectDate.second=1; 
+            if(taps==2)
+                [self createAddevent];
+            
+            [self setNeedsDisplay];
+            
+        }
+    }
+    
+}
+
+-(void)createAddevent{
+    
+     AddEvent *addEvent = [AddEvent alloc] ;
+    
+    addEvent.cVc=self;
+    
+    NSString *miti = [NSString stringWithFormat:@"%d-%d-%d",currentSelectDate.year,currentSelectDate.month,currentSelectDate.day];
+    addEvent.dateString = miti;
+    addEvent.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+    
+    [self addSubview:addEvent.view];
+    addEvent.dateText.text = miti;
+     
+    
+
+<<<<<<< HEAD
+    
+    
+}
+
+=======
+    /*
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
+
+    int width=self.frame.size.width;
+    UITouch* touch = [touches anyObject];
+    CGPoint touchPoint = [touch locationInView:self];
+<<<<<<< HEAD
+    if((touchPoint.x>=40 && touchPoint.x<=width) && (touchPoint.y>=80 && touchPoint.y<=300 )){
+        int x;
+        int y;
+        int width=self.frame.size.width-40;//320
+        
+        int weekday=[self getMonthWeekday:currentMonthDate];// get the current month
+        int monthDayCount=[self getDayCountOfaMonth:currentMonthDate];//get the total day of the month
+        x=((touchPoint.x-40)*7)/width;
+        y=(touchPoint.y-(uppermargin))/height;
+        int monthday=x+y*7-weekday+2;
+        
+        // NSLog(@"x=%f  y=%f  monthday=%d",touchPoint.x,touchPoint.y,monthday);
+        if(monthday>0 && monthday<monthDayCount+1){
+            currentSelectDate.year=currentMonthDate.year;
+            currentSelectDate.month=currentMonthDate.month;
+            currentSelectDate.day=monthday;
+            currentSelectDate.hour=0;
+            currentSelectDate.minute=0;
+            currentSelectDate.second=1; 
+            //[self changeColor];
+            [self setNeedsDisplay];
+            
+            //  [self createAddevent]; 
+            
+        }
+    }
+    
+}
+-(void)doubleTap:(UILongPressGestureRecognizer *)sender{
+    
+    [self createAddevent];
+    
+}
+
+=======
+    if((touchPoint.x>=40 && touchPoint.x<=width) && (touchPoint.y>=80 && touchPoint.y<=250 )){
+        
+        [self touchAtDate:touchPoint];
+     
+     
+        
+        
+        
+        // AddEvent *addEvent = [[AddEvent alloc]initWithNibName:@"AddEvent" bundle:nil];
+        
+        
+        //[self.window addSubview:addEvent.view];
+        //[self presentModalViewContoller:addEvent animated:YES];
+        
+        
+        
+        
+        
+        // [self changeColor];
+        //NSLog(@"check====x:%f  y:%f",touchPoint.x,touchPoint.y);
+        
+        
+    }
+        
+}
+*/     
+     
+>>>>>>> 60bb0a6d5558e7e71b6c8f9d884365ab9783ff54
+-(void) drawToday{
+    
+    int x;
+    int y;
+    int day;
+    CFGregorianDate today = CFAbsoluteTimeGetGregorianDate(currentTime, CFTimeZoneCopySystem());
+    if(today.month == currentMonthDate.month && today.year==currentMonthDate.year){
+        
+        int width = self.frame.size.width;
+        int s_width=width/8;
+        int weekday = [self getMonthWeekday:currentMonthDate];
+        day=today.day+weekday-2;
+        x=day%7;
+        y=day/7;
+        
+        CGContextRef ctx = UIGraphicsGetCurrentContext();
+        
+        
+        //to shade the cell for today's date
+	 	CGContextSetRGBFillColor(ctx, 0.5, 0.5, 0.5, 1);
+		CGContextMoveToPoint(ctx, x*s_width+40, y*35+80);
+		CGContextAddLineToPoint(ctx, x*s_width+s_width+40, y*35+80);
+		CGContextAddLineToPoint(ctx, x*s_width+s_width+40, y*35+115);
+		CGContextAddLineToPoint(ctx, x*s_width+40, y*35+115);
+		CGContextFillPath(ctx); 
+        
+        
+        
+        CGContextSetRGBFillColor(ctx, 0, 1, 1, 1);
+        UIFont *weekfont = [UIFont boldSystemFontOfSize:15];
+        NSString *date = [[NSString alloc]initWithFormat:@"%2d",today.day];
+        
+        [date drawAtPoint:CGPointMake(x*s_width+50, y*35+90) withFont:weekfont];
+        
+        //if there is event on this date, draw eventmark
+        UIColor *eventColor= [UIColor colorWithRed:1.0f green:0.0f blue:0.0f alpha:1.0f];//set the fill color
+        [self drawEventMarkwithX:x*s_width+50 andY:y*35+80 andColor:eventColor];
+        //draw eventmark ends here
+        
+    }
+}
+
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect
+{
+    // Drawing code
+    currentTime = CFAbsoluteTimeGetCurrent();
+    [self drawTopGradientBar]; 
+    
+    [self drawNameOfDaysAtTop];
+    [self drawDateBoxes];
+    [self drawDateWords];
+    [self changeColor];
+    [self drawToday];
+    
+    
+    
+}
+
+
+@end
